@@ -4,11 +4,21 @@ var gamestate = "serve";
 var colors= ["red","green","blue","yellow","orange","purple","cyan"];
 var a=0;
 var bricks;
+var ball_img;
+var ball_s
+
+function preload(){
+
+ball_img=loadImage('red_op.png');
+ball_s=loadSound('ping.mp3')
+}
 
 function setup(){
   var canvas = createCanvas(1200,600);
-ball = createSprite(200,200,10,10);
+ball = createSprite(200,430,10,10);
 ball.shapeColor="white";
+ball.addImage('ballgame',ball_img);
+ball.scale=0.05;
 //ball.setAnimation("golfball_1");
 
 
@@ -46,8 +56,14 @@ function draw() {
   
   
   if(gamestate == "serve"){
-    text("Click to serve the ball.", 120,450);
-    mousePressed();
+    text("Press space to serve the ball :)", 400,350);
+    if(keyDown == 32){
+      gamestate = "play";
+      console.log(gamestate);
+      ball.velocityY = -7;
+      ball.velocityX = -7;
+    }
+  //  mousePressed();
   }
 
   
@@ -55,8 +71,8 @@ function draw() {
   if(gamestate =='play'){
   text("Score: "+score,1000,25);
   
-  paddle.x = World.mouseX;
-  
+  //paddle.x = World.mouseX;
+  paddle.x=ball.x;
   if(paddle.x < 10)
   {
     paddle.x = 60;
@@ -68,12 +84,21 @@ function draw() {
   }
   
   //rotation = rotation + 5;
-  
+
   ball.bounceOff(edges[0]);
   ball.bounceOff(edges[1]);
   ball.bounceOff(edges[2]);
   ball.bounceOff(paddle);
   ball.bounceOff(bricks, brickHit);
+if(ball.isTouching(edges[3])){
+  console.log("Game Over");
+  ball.x = paddle.x;
+  ball.y= paddle.y-15;
+  ball.velocityX=0;
+  ball.velocityY=0;
+  gamestate="serve";
+}
+
   }
   
   if(!bricks[0])
@@ -81,32 +106,33 @@ function draw() {
     //console.log("Won");
     ball.velocityX = 0;
     ball.velocityY = 0;
-    text("Well Done!!",150,200);
+    text("Well Done!!",370,200);
     gamestate="end";
   }
 
   if(gamestate =="end") {
-    text("Game Over", 150, 250);
+    text("Game Over", 370, 250);
     ball.remove;
   }
   drawSprites();
 }
 
 
-function mousePressed()
+function keyPressed()
 {
-  
+  if(keyCode === 32){
   if(gamestate == "serve"){
     gamestate = "play";
     console.log(gamestate);
     ball.velocityY = -7;
     ball.velocityX = -7;
   }
-  
+} 
 }
 
 function brickHit(ball, brick) {
  //playSound("sound://category_hits/puzzle_game_button_04.mp3");
+ball_s.play();
  brick.remove();
  score = score+5;
   
